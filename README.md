@@ -22,6 +22,6 @@ npm install @xcellerate/n8n-nodes-xcellerate
 
 ### Via n8n Interface
 1. Go to **Settings** → **Community Nodes**
-2. Enter: `n8n-nodes-xcellerate`
+2. Enter: `@xcellerate/n8n-nodes-xcellerate`
 3. Click **Install**
 4. Restart n8n if required
