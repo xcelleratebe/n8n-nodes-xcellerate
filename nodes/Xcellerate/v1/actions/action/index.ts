@@ -15,7 +15,7 @@ export const description: INodeProperties[] = [
 				resource: ['action']
 			}
 		},
-		default: 'list',
+		default: 'bulk',
 		options: [
 			{
 				name: 'Bulk',

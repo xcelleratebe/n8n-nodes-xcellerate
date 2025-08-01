@@ -1,6 +1,6 @@
 {
   "name": "@xcellerate/n8n-nodes-xcellerate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n-community-node-package for interaction and management using Xcellerate",
   "keywords": [
     "n8n-community-node-package"
