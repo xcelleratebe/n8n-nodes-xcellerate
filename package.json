@@ -1,6 +1,6 @@
 {
   "name": "@xcellerate/n8n-nodes-xcellerate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "n8n-community-node-package for interaction and management using Xcellerate",
   "keywords": [
     "n8n-community-node-package"
@@ -33,7 +33,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/Xcellerate.credentials.js"
+      "dist/credentials/XcellerateApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/Xcellerate/Xcellerate.node.js"
