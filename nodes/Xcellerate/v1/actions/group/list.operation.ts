@@ -1,13 +1,6 @@
-import {
-	DeclarativeRestApiSettings,
-	IDataObject,
-	IExecuteFunctions,
-	INodeProperties,
-	updateDisplayOptions,
-} from 'n8n-workflow';
+import { IDataObject, IExecuteFunctions, INodeProperties, updateDisplayOptions } from 'n8n-workflow';
 import { queryAble, returnAllOrLimit } from '../../descriptions';
-import { xcellerateApiRequest, xcellerateApiRequestAll } from '../../transport';
-import HttpRequestOptions = DeclarativeRestApiSettings.HttpRequestOptions;
+import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 
 export const properties: INodeProperties[] = [
 	... returnAllOrLimit,
@@ -29,37 +22,28 @@ export const description = updateDisplayOptions(
 export async function execute(this: IExecuteFunctions, index: number) {
 	let responseData;
 	const returnAll = this.getNodeParameter('returnAll', index);
-	let requestOptions: HttpRequestOptions = {
-		qs: {
+	const query: string = this.getNodeParameter('query', index) as string;
+	let requestOptions = buildHttpRequest({
+		query: {
 			columns: [
 				'id',
 				'name',
 				'state',
-			]
-		}
-	};
+			],
+			query: query,
+			perPage: this.getNodeParameter('limit', index, 20),
+		},
+		returnAll: returnAll,
+	});
 
-	requestOptions.qs = requestOptions.qs ?? {};
-	const query: string = this.getNodeParameter('query', index) as string;
-	if (query !== '') {
-		requestOptions.qs.query = query;
-	}
+	responseData = await xcellerateApiRequest.call(
+		this,
+		'/groups',
+		requestOptions,
+		returnAll,
+	)
 
-	const endpoint = '/groups';
-	if (returnAll) {
-		responseData = await xcellerateApiRequestAll.call(this, endpoint, requestOptions);
-	} else {
-		requestOptions.qs.perPage = this.getNodeParameter('limit', 0, 20);
-
-		responseData = await xcellerateApiRequest.call(
-			this,
-			endpoint,
-			requestOptions
-		)
-		responseData = responseData.data;
-	}
-
-	const executionData = this.helpers.constructExecutionMetaData(
+	return this.helpers.constructExecutionMetaData(
 		this.helpers.returnJsonArray(responseData.map((group: ApiGroup) => {
 			return {
 				id: group.id,
@@ -67,9 +51,7 @@ export async function execute(this: IExecuteFunctions, index: number) {
 				enabled: !!group.state,
 			} as unknown as Group;
 		}) as IDataObject),
-		{ itemData : { item: index } },
-	)
-
-	return executionData;
+		{ itemData: { item: index } },
+	);
 }
 

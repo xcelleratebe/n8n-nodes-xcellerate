@@ -1,9 +1,4 @@
-import {
-  IDataObject,
-  IExecuteFunctions,
-  INodeProperties,
-  updateDisplayOptions
-} from "n8n-workflow";
+import { IDataObject, IExecuteFunctions, INodeProperties, updateDisplayOptions } from 'n8n-workflow';
 import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 
 export const properties: INodeProperties[] = [
@@ -47,10 +42,8 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		})
 	)
 
-	const executionData = this.helpers.constructExecutionMetaData(
-		this.helpers.returnJsonArray(responseData.data as IDataObject),
-		{ itemData : { item: index } },
-	)
-
-	return executionData;
+	return this.helpers.constructExecutionMetaData(
+		this.helpers.returnJsonArray(responseData as IDataObject),
+		{ itemData: { item: index } },
+	);
 }

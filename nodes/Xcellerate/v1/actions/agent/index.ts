@@ -21,7 +21,7 @@ export const description: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				description: 'Lis agents',
+				description: 'List agents',
 				action: 'List agents',
 			},
 			{

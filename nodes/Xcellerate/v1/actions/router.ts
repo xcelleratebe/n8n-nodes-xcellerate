@@ -18,11 +18,9 @@ export async function router(this: IExecuteFunctions) {
 		operation
 	} as Xcellerate;
 
-	if (xcellerate.resource === 'agent'
-		&& (xcellerate.operation === 'sendAction' || xcellerate.operation === 'sendScript')
-	) {
-		responseData = await agent[xcellerate.operation].execute.call(this, 0);
-		return [responseData];
+	const bulkData = await handleBulkAction.call(this, xcellerate);
+	if (bulkData !== false) {
+		return bulkData;
 	}
 
 	for (let i = 0; i < items.length; i++) {
@@ -60,4 +58,30 @@ export async function router(this: IExecuteFunctions) {
 			throw error;
 		}
 	}
-	return [returnData];}
+	return [returnData];
+}
+
+async function handleBulkAction(this: IExecuteFunctions, xcellerate: Xcellerate) {
+	let responseData;
+	if (xcellerate.resource === 'agent'
+		&& (xcellerate.operation === 'sendAction' || xcellerate.operation === 'sendScript')
+	) {
+		responseData = await agent[xcellerate.operation].execute.call(this, 0);
+		return [responseData];
+	}
+
+	if (xcellerate.resource === 'action' && xcellerate.operation === 'bulk') {
+		responseData = await action[xcellerate.operation].execute.call(this, 0);
+		return [responseData];
+	}
+
+
+	if (xcellerate.resource === 'vulnerability' && xcellerate.operation === 'user') {
+		responseData = await vulnerability[xcellerate.operation].execute.call(this, 0);
+		return [responseData];
+	}
+
+	return false;
+}
+
+

@@ -1,13 +1,6 @@
-import {
-	DeclarativeRestApiSettings,
-	IDataObject,
-	IExecuteFunctions,
-	INodeProperties,
-	updateDisplayOptions,
-} from 'n8n-workflow';
+import { IDataObject, IExecuteFunctions, INodeProperties, updateDisplayOptions } from 'n8n-workflow';
 import { queryAble, returnAllOrLimit } from '../../descriptions';
-import { xcellerateApiRequest, xcellerateApiRequestAll } from '../../transport';
-import HttpRequestOptions = DeclarativeRestApiSettings.HttpRequestOptions;
+import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 
 export const properties: INodeProperties[] = [
 	{
@@ -34,39 +27,27 @@ export const description = updateDisplayOptions(
 );
 
 export async function execute(this: IExecuteFunctions, index: number) {
-	let responseData;
-	const returnAll = this.getNodeParameter('returnAll', index);
-	let requestOptions: HttpRequestOptions = {
-		qs: {
-		}
-	};
-
-	requestOptions.qs = requestOptions.qs ?? {};
-	const query: string = this.getNodeParameter('query', index) as string;
-	if (query !== '') {
-		requestOptions.qs.query = query;
-	}
 	const id = this.getNodeParameter('groupId', index);
+	const returnAll = this.getNodeParameter('returnAll', index);
+	const query: string = this.getNodeParameter('query', index) as string;
 
-	const endpoint = `/groups/${id}/agents`;
-	if (returnAll) {
-		responseData = await xcellerateApiRequestAll.call(this, endpoint, requestOptions);
-	} else {
-		requestOptions.qs.perPage = this.getNodeParameter('limit', 0, 20);
+	let requestOptions = buildHttpRequest({
+		query: {
+			query: query,
+			perPage:  this.getNodeParameter('limit', index, 20)
+		}
+	})
 
-		responseData = await xcellerateApiRequest.call(
-			this,
-			endpoint,
-			requestOptions
-		)
-		responseData = responseData.data;
-	}
-
-	const executionData = this.helpers.constructExecutionMetaData(
-		this.helpers.returnJsonArray(responseData as IDataObject),
-		{ itemData : { item: index } },
+	const responseData = await xcellerateApiRequest.call(
+		this,
+		`/groups/${id}/agents`,
+		requestOptions,
+		returnAll,
 	)
 
-	return executionData;
+	return this.helpers.constructExecutionMetaData(
+		this.helpers.returnJsonArray(responseData as IDataObject),
+		{ itemData: { item: index } },
+	);
 }
 

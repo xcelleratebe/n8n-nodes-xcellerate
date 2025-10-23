@@ -1,12 +1,5 @@
-import {
-	IDataObject,
-	IExecuteFunctions,
-	IHttpRequestMethods,
-	INodeProperties,
-	IRequestOptions, NodeApiError,
-	updateDisplayOptions,
-} from 'n8n-workflow';
-import { xcellerateApiRequest } from '../../transport';
+import { IDataObject, IExecuteFunctions, INodeProperties, NodeApiError, updateDisplayOptions } from 'n8n-workflow';
+import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 import { agentUuid } from '../../descriptions';
 
 export const properties: INodeProperties[] = [
@@ -48,15 +41,13 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		agentUuids.push(item.json.uuid);
 	}
 	const script = this.getNodeParameter('script', 0) as string;
-	let requestOptions: IRequestOptions;
-	requestOptions = {
-		method: 'POST' as IHttpRequestMethods,
-		json: true,
+	const requestOptions = buildHttpRequest({
+		method: 'POST',
 		body: {
 			agent_uuids: agentUuids,
 			script_id: script,
 		}
-	}
+	});
 
 	const responseData = await xcellerateApiRequest.call(
 		this,
@@ -68,10 +59,8 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		throw NodeApiError;
 	}
 
-	const executionData = this.helpers.constructExecutionMetaData(
+	return this.helpers.constructExecutionMetaData(
 		this.helpers.returnJsonArray(responseData.data as IDataObject),
-		{ itemData : { item: index } },
-	)
-
-	return executionData;
+		{ itemData: { item: index } },
+	);
 }

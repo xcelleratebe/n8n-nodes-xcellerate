@@ -8,7 +8,7 @@ export async function getCommands(this: ILoadOptionsFunctions): Promise<INodePro
 		json: true,
 	}
 	const response = await xcellerateApiRequest.call(this, '/actions', requestOptions)
-	return response.data.map((action: Action) => {
+	return response.map((action: Action) => {
 		return {
 			name: action.name,
 			description: action.command,
@@ -24,7 +24,7 @@ export async function getScripts(this: ILoadOptionsFunctions): Promise<INodeProp
 		json: true,
 	}
 	const response = await xcellerateApiRequest.call(this, '/scripts', requestOptions)
-	return response.data.map((script: Script) => {
+	return response.map((script: Script) => {
 		return {
 			name: script.name,
 			value: script.id,
@@ -40,7 +40,7 @@ export async function getPackages(this: ILoadOptionsFunctions): Promise<INodePro
 		json: true,
 	}
 	const response = await xcellerateApiRequest.call(this, '/app-deploy/packages', requestOptions)
-	return response.data.map((appdeployPackage: Package) => {
+	return response.map((appdeployPackage: Package) => {
 		return {
 			name: appdeployPackage.title,
 			value: appdeployPackage.original_package_id,
@@ -56,7 +56,7 @@ export async function getAssignableUsers(this: ILoadOptionsFunctions): Promise<I
 		json: true,
 	}
 	const response = await xcellerateApiRequest.call(this, '/vulnerabilities/users', requestOptions)
-	return response.data.map((user: AssignableUser) => {
+	return response.map((user: AssignableUser) => {
 		return {
 			name: user.name,
 			value: user.id,

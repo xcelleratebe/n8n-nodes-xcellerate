@@ -24,10 +24,8 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		this,
 		`/agents/${uuid}`,
 	)
-	const executionData = this.helpers.constructExecutionMetaData(
+	return this.helpers.constructExecutionMetaData(
 		this.helpers.returnJsonArray(responseData.agent as IDataObject),
-		{ itemData : { item: index } },
-	)
-
-	return executionData;
+		{ itemData: { item: index } },
+	);
 }

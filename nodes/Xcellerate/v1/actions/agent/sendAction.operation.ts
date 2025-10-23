@@ -1,12 +1,5 @@
-import {
-	IDataObject,
-	IExecuteFunctions,
-	IHttpRequestMethods,
-	INodeProperties,
-	IRequestOptions, NodeApiError,
-	updateDisplayOptions,
-} from 'n8n-workflow';
-import { xcellerateApiRequest } from '../../transport';
+import { IDataObject, IExecuteFunctions, INodeProperties, NodeApiError, updateDisplayOptions } from 'n8n-workflow';
+import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 import { actionCommand, agentUuid } from '../../descriptions';
 import { getActionFromNode } from '../../helpers/actions';
 
@@ -40,16 +33,14 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		index
 	);
 
-	let requestOptions: IRequestOptions;
-	requestOptions = {
-		method: 'POST' as IHttpRequestMethods,
-		json: true,
+	const requestOptions = buildHttpRequest({
+		method: 'POST',
 		body: {
 			agents: agentUuids,
 			command: command,
 			properties: properties
 		}
-	}
+	});
 
 	const responseData = await xcellerateApiRequest.call(
 		this,
@@ -61,10 +52,8 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		throw NodeApiError;
 	}
 
-	const executionData = this.helpers.constructExecutionMetaData(
+	return this.helpers.constructExecutionMetaData(
 		this.helpers.returnJsonArray(responseData.data as IDataObject),
-		{ itemData : { item: index } },
-	)
-
-	return executionData;
+		{ itemData: { item: index } },
+	);
 }
