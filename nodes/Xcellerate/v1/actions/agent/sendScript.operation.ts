@@ -7,16 +7,10 @@ import {
 	updateDisplayOptions,
 } from 'n8n-workflow';
 import { xcellerateApiRequest } from '../../transport';
+import { agentUuid } from '../../descriptions';
 
 export const properties: INodeProperties[] = [
-	{
-		displayName: 'Agent UUID',
-		name: 'agentUuid',
-		description: 'The UUID of the agent to fetch data from',
-		type: 'string',
-		required: true,
-		default: '',
-	},
+	... agentUuid,
 	{
 		/* eslint-disable n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options */
 		/* Disabling this, because we set noDataExpression */

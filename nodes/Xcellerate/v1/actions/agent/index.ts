@@ -21,7 +21,7 @@ export const description: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				description: 'List agents',
+				description: 'Lis agents',
 				action: 'List agents',
 			},
 			{
@@ -31,7 +31,7 @@ export const description: INodeProperties[] = [
 				action: 'Get specific agent',
 			},
 			{
-				name: 'Send Action',
+				name: 'Send bulk action',
 				value: 'sendAction',
 				action: 'Send action',
 			},
@@ -39,7 +39,7 @@ export const description: INodeProperties[] = [
 				name: 'Execute Script',
 				value: 'sendScript',
 				action: 'Execute script',
-			}
+			},
 		],
 		default: 'list',
 	},
