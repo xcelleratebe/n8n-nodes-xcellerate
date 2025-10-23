@@ -1,12 +1,10 @@
 import {
-  DeclarativeRestApiSettings,
   IDataObject,
   IExecuteFunctions,
   INodeProperties,
   updateDisplayOptions
 } from "n8n-workflow";
-import { xcellerateApiRequest } from '../../transport';
-import HttpRequestOptions = DeclarativeRestApiSettings.HttpRequestOptions;
+import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 
 export const properties: INodeProperties[] = [
 	{
@@ -39,20 +37,15 @@ export async function execute(this: IExecuteFunctions, index: number) {
     actionUuids.push(this.getNodeParameter('actionUuid', Number.parseInt(key)));
   }
 
-  let httpOptions: HttpRequestOptions = {
-    body: {}
-  };
-  httpOptions.body = {
-    uuids: actionUuids,
-  }
-  this.logger.warn(JSON.stringify(actionUuids));
-
 	const responseData = await xcellerateApiRequest.call(
 		this,
 		`/actions/bulk`,
-    httpOptions
+    buildHttpRequest({
+			body: {
+				uuids: actionUuids,
+			},
+		})
 	)
-
 
 	const executionData = this.helpers.constructExecutionMetaData(
 		this.helpers.returnJsonArray(responseData.data as IDataObject),

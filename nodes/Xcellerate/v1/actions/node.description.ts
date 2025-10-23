@@ -7,6 +7,7 @@ import {
 import * as agent from './agent';
 import * as group from './group';
 import * as action from './action';
+import * as vulnerability from './vulnerability';
 
 export const description: INodeTypeDescription = {
 	displayName: 'Xcellerate.app',
@@ -45,6 +46,10 @@ export const description: INodeTypeDescription = {
 				{
 					name: 'Action',
 					value: 'action',
+				},
+				{
+					name: 'Vulnerability',
+					value: 'vulnerability',
 				}
 			],
 			default: 'agent',
@@ -52,5 +57,6 @@ export const description: INodeTypeDescription = {
 		... agent.description,
 		... group.description,
 		... action.description,
+		... vulnerability.description,
 	]
 };

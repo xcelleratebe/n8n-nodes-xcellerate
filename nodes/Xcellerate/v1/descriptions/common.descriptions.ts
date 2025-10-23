@@ -124,3 +124,32 @@ export const actionCommand: INodeProperties[] = [
 		]
 	}
 ];
+
+export const cveIdProperty: INodeProperties[] = [
+	{
+		displayName: 'CVE ID',
+		name: 'cveId',
+		description: 'The ID of the CVE fetch data from',
+		type: 'string',
+		required: true,
+		default: '',
+	},
+];
+
+export const assignVulnerabilityUserProperty: INodeProperties[] = [
+	{
+		/* eslint-disable n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options */
+		/* Disabling this, because we set noDataExpression */
+		displayName: 'User',
+		name: 'userId',
+		/* eslint-disable n8n-nodes-base/node-param-description-wrong-for-dynamic-options */
+		/* Disabling this, because we set noDataExpression */
+		description: 'The user to assign the vulnerability to',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getAssignableUsers'
+		},
+		noDataExpression: true,
+		default: '',
+	},
+];

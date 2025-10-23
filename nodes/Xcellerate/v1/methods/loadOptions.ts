@@ -48,3 +48,19 @@ export async function getPackages(this: ILoadOptionsFunctions): Promise<INodePro
 		};
 	});
 }
+
+export async function getAssignableUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+	let requestOptions: IRequestOptions;
+	requestOptions = {
+		method: 'GET' as IHttpRequestMethods,
+		json: true,
+	}
+	const response = await xcellerateApiRequest.call(this, '/vulnerabilities/users', requestOptions)
+	return response.data.map((user: AssignableUser) => {
+		return {
+			name: user.name,
+			value: user.id,
+			description: user.company ?? 'None'
+		};
+	});
+}

@@ -1,8 +1,9 @@
-import { IExecuteFunctions, INodeExecutionData, NodeApiError, NodeOperationError } from 'n8n-workflow';
+import {IExecuteFunctions, INodeExecutionData, NodeApiError, NodeOperationError} from 'n8n-workflow';
 
 import * as agent from './agent';
 import * as group from './group';
 import * as action from './action';
+import * as vulnerability from './vulnerability';
 import { Xcellerate } from './node.type';
 
 export async function router(this: IExecuteFunctions) {
@@ -24,12 +25,6 @@ export async function router(this: IExecuteFunctions) {
 		return [responseData];
 	}
 
-	if (xcellerate.resource === 'action' && xcellerate.operation === 'bulk') {
-		responseData = await action[xcellerate.operation].execute.call(this, 0);
-		return [responseData];
-	}
-
-
 	for (let i = 0; i < items.length; i++) {
 		try {
 			switch (xcellerate.resource) {
@@ -38,6 +33,9 @@ export async function router(this: IExecuteFunctions) {
 					break;
 				case 'group':
 					responseData = await group[xcellerate.operation].execute.call(this, i);
+					break ;
+				case 'vulnerability':
+					responseData = await vulnerability[xcellerate.operation].execute.call(this, i);
 					break ;
 				default:
 					throw new NodeOperationError(this.getNode(), `The resource ${resource} is not known`);
