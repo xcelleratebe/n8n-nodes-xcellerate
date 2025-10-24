@@ -29,20 +29,17 @@ export const description = updateDisplayOptions(
 export async function execute(this: IExecuteFunctions, index: number) {
 	const id = this.getNodeParameter('groupId', index);
 	const returnAll = this.getNodeParameter('returnAll', index);
-	const query: string = this.getNodeParameter('query', index) as string;
 
-	let requestOptions = buildHttpRequest({
-		query: {
-			query: query,
-			perPage:  this.getNodeParameter('limit', index, 20)
-		}
-	})
+	let requestOptions = buildHttpRequest({});
 
 	const responseData = await xcellerateApiRequest.call(
 		this,
 		`/groups/${id}/agents`,
 		requestOptions,
 		returnAll,
+		{
+			index: index,
+		}
 	)
 
 	return this.helpers.constructExecutionMetaData(

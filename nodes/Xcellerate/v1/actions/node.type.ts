@@ -4,7 +4,7 @@ type NodeMap = {
 	agent: 'list' | 'get' | 'sendAction' | 'sendScript',
 	group: 'list' | 'listAgents',
 	action: 'bulk',
-	vulnerability: 'list' | 'get' | 'user' | 'assign',
+	vulnerability: 'list' | 'get' | 'user' | 'assign' | 'affected',
 }
 
 export type Xcellerate = AllEntities<NodeMap>

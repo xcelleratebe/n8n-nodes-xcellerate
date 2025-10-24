@@ -1,4 +1,4 @@
-import { INodeProperties } from 'n8n-workflow';
+import { INodeProperties, INodePropertyOptions } from 'n8n-workflow';
 
 export const returnAllOrLimit: INodeProperties[] = [
 	{
@@ -7,6 +7,21 @@ export const returnAllOrLimit: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Page',
+		name: 'page',
+		type: 'number',
+		displayOptions: {
+			show: {
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 1,
+		description: 'Page to get',
 	},
 	{
 		displayName: 'Limit',
@@ -153,3 +168,34 @@ export const assignVulnerabilityUserProperty: INodeProperties[] = [
 		default: '',
 	},
 ];
+
+export function sortAble(keys: Array<INodePropertyOptions>, defaultKey?: string, defaultSort?: string): INodeProperties[]
+{
+	return [
+		{
+			displayName: 'Sort field',
+			name: 'sortBy',
+			type: 'options',
+			default: defaultKey,
+			noDataExpression: true,
+			options: keys,
+		},
+		{
+			displayName: 'Order by',
+			name: 'sortDirection',
+			type: 'options',
+			default: defaultSort,
+			noDataExpression: true,
+			options: [
+				{
+					name: 'Ascending',
+					value: 'asc',
+				},
+				{
+					name: 'Descending',
+					value: 'desc',
+				}
+			]
+		}
+	]
+}

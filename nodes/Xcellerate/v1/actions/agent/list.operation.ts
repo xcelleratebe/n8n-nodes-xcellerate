@@ -23,10 +23,6 @@ export async function execute(this: IExecuteFunctions, index: number) {
 	let responseData;
 	const returnAll = this.getNodeParameter('returnAll', index);
 	const requestOptions = buildHttpRequest({
-		query: {
-			perPage: this.getNodeParameter('limit', index, 20),
-			query: this.getNodeParameter('query', index, ''),
-		},
 		returnAll: returnAll,
 	});
 
@@ -34,7 +30,10 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		this,
 		'/agents',
 		requestOptions,
-		returnAll
+		returnAll,
+		{
+			index: index,
+		}
 	)
 
 	return this.helpers.constructExecutionMetaData(

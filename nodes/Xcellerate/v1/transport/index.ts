@@ -10,12 +10,20 @@ export async function xcellerateApiRequest(
 	uri: string,
 	options: IRequestOptions = {},
 	returnAll = false,
-	wrapped: string = 'data',
+	props: ApiRequestProperties = {}
 ) {
+	const { wrapped = 'data', index = 0 } = props;
+
 	if (returnAll) {
-		return await xcellerateApiRequestAll.call(this, uri, options, wrapped);
+		return await xcellerateApiRequestAll.call(this, uri, options, {
+			wrapped: wrapped,
+			index: index,
+		});
 	}
-	const response = await _xcellerateApiCall.call(this, uri, options);
+	const response = await _xcellerateApiCall.call(this, uri, options, {
+		wrapped: wrapped,
+		index: index,
+	});
 	return response[wrapped] ?? [];
 }
 
@@ -23,9 +31,9 @@ async function xcellerateApiRequestAll(
 	this: IExecuteFunctions|ILoadOptionsFunctions,
 	uri: string,
 	options: IRequestOptions = {},
-	wrapped: string = 'data',
+	props: ApiRequestProperties = {}
 ) {
-	this.logger.error('LOOPING!');
+	const { wrapped = 'data', index = 0 } = props;
 	let responseData;
 	const returnData:IDataObject[]  = [];
 
@@ -35,7 +43,10 @@ async function xcellerateApiRequestAll(
 	let page = 1;
 	do {
 		options.qs.page = page;
-		responseData = await _xcellerateApiCall.call(this, uri, options)
+		responseData = await _xcellerateApiCall.call(this, uri, options, {
+			wrapped: wrapped,
+			index: index,
+		})
 		returnData.push.apply(returnData, responseData[wrapped] as IDataObject[]);
 		page ++;
 	} while (responseData['links']['next'] !== null)
@@ -43,11 +54,46 @@ async function xcellerateApiRequestAll(
 	return returnData;
 }
 
-async function _xcellerateApiCall(this: IExecuteFunctions|ILoadOptionsFunctions, uri: string, options: IRequestOptions) {
+async function _xcellerateApiCall(
+	this: IExecuteFunctions|ILoadOptionsFunctions,
+	uri: string,
+	options: IRequestOptions,
+	props: ApiRequestProperties = {}
+) {
+	const { index = 0 } = props;
+
 	const credentials = await this.getCredentials('xcellerateApi');
 	const serverUrl = `${credentials.URL}/api/v1`;
 	const apiKey = credentials.apiKey;
 	const tenantId = credentials.tenantID;
+
+	let additionalQuery: Record<string, any> = {};
+	let sortKey = this.getNodeParameter('sortBy', index, null) as string | null;
+	let perPage = this.getNodeParameter('limit', index, null) as number;
+	let page = this.getNodeParameter('page', index, 1) as number;
+	let query = this.getNodeParameter('query', index, '') as string;
+
+	if (sortKey !== null) {
+		additionalQuery.sort = sortKey;
+		additionalQuery.direction = this.getNodeParameter('sortDirection', index, 'desc') as string;
+	}
+
+
+	if (perPage !== null) {
+		additionalQuery.perPage = perPage;
+	}
+	if (additionalQuery.page === undefined) {
+		additionalQuery.page = page;
+	}
+
+	if (query !== '') {
+		additionalQuery.query = query;
+	}
+
+	options.qs = {
+		... options.qs,
+		... additionalQuery,
+	}
 
 	const requestOptions: IRequestOptions = {
 		... options,
@@ -59,7 +105,12 @@ async function _xcellerateApiCall(this: IExecuteFunctions|ILoadOptionsFunctions,
 		uri: `${serverUrl}${uri}`,
 		json: true
 	}
-	return this.helpers.request(requestOptions);
+	const response = await this.helpers.request(requestOptions);
+
+	this.logger.debug(`Request URL: ${requestOptions.uri}`);
+	this.logger.debug(JSON.stringify(response));
+
+	return response;
 }
 
 export function buildHttpRequest(
@@ -91,6 +142,10 @@ export function buildHttpRequest(
 	return requestOptions;
 }
 
+interface ApiRequestProperties {
+	wrapped?: string;
+	index?: number;
+}
 
 interface BuildHttpRequestParams {
 	method?: string;

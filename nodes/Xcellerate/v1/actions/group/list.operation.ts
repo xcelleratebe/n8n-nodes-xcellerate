@@ -1,10 +1,24 @@
 import { IDataObject, IExecuteFunctions, INodeProperties, updateDisplayOptions } from 'n8n-workflow';
-import { queryAble, returnAllOrLimit } from '../../descriptions';
+import { queryAble, returnAllOrLimit, sortAble } from '../../descriptions';
 import { buildHttpRequest, xcellerateApiRequest } from '../../transport';
 
 export const properties: INodeProperties[] = [
 	... returnAllOrLimit,
 	... queryAble,
+	... sortAble([
+		{
+			name: 'Group name',
+			value: 'name',
+		},
+		{
+			name: 'Agent count',
+			value: 'agent_count',
+		},
+		{
+			name: 'Group priority',
+			value: 'priority',
+		}
+	])
 ];
 
 const displayOptions = {
@@ -22,7 +36,6 @@ export const description = updateDisplayOptions(
 export async function execute(this: IExecuteFunctions, index: number) {
 	let responseData;
 	const returnAll = this.getNodeParameter('returnAll', index);
-	const query: string = this.getNodeParameter('query', index) as string;
 	let requestOptions = buildHttpRequest({
 		query: {
 			columns: [
@@ -30,8 +43,6 @@ export async function execute(this: IExecuteFunctions, index: number) {
 				'name',
 				'state',
 			],
-			query: query,
-			perPage: this.getNodeParameter('limit', index, 20),
 		},
 		returnAll: returnAll,
 	});
@@ -41,6 +52,9 @@ export async function execute(this: IExecuteFunctions, index: number) {
 		'/groups',
 		requestOptions,
 		returnAll,
+		{
+			index: index,
+		}
 	)
 
 	return this.helpers.constructExecutionMetaData(
